@@ -25,6 +25,7 @@
  * v4l2test.c
  *
  * 1) Video device init/close functions
+ * 2) Video device open and query cap
  *
  *
  */
@@ -55,6 +56,13 @@
 #include <linux/videodev2.h>
 
 
+
+/* Hash defines  */
+#define DEVICE_NAME "/dev/video0"
+
+
+
+/* Structs and Variable declarations and definitions */
 struct buffer
 {
 	unsigned int idx;
@@ -88,24 +96,47 @@ struct device
 };
 
 
+
+/* Static Function declarations */
 static void video_init(struct device *dev);
 static void video_close(struct device *dev);
+static int video_querycap(struct device *dev, unsigned int *capabilities);
+static bool video_has_fd(struct device *dev);
+static int video_open(struct device *dev, const char *devname);
 
 
-int main(int argc, char *argv[])
+
+int main()
 {
 
 	struct device dev = { 0 };
-//	int ret;
+	unsigned int capabilities = V4L2_CAP_VIDEO_CAPTURE;
+	int ret = 0;
 
 	printf("Vikas: main() +\n");
 
 	video_init(&dev);
+	printf("Vikas: video_init() DONE\n");
 
+	if (!video_has_fd(&dev)) {
+		ret = video_open(&dev, DEVICE_NAME);
+		if (ret < 0) {
+			printf("Vikas: ERR: video_open() failed\n");
+			return 1;
+		}
+	}
+	printf("Vikas: video_open() DONE\n");
 
+	ret = video_querycap(&dev, &capabilities);
+	if (ret < 0) {
+		printf("Vikas: ERR: video_querycap() failed\n");
+		return 1;
+	}
 
+	printf("Vikas: video_querycap() DONE\n");
 
 	video_close(&dev);
+	printf("Vikas: video_close() DONE\n");
 
 	printf("Vikas: main() -\n");
 	return 0;
@@ -132,5 +163,76 @@ static void video_close(struct device *dev)
 		close(dev->fd);
 }
 
+static int video_querycap(struct device *dev, unsigned int *capabilities)
+{
+	struct v4l2_capability cap;
+	unsigned int caps;
+	bool has_video;
+	bool has_meta;
+	bool has_capture;
+	bool has_output;
+	bool has_mplane;
+	int ret;
 
+	memset(&cap, 0, sizeof cap);
+	ret = ioctl(dev->fd, VIDIOC_QUERYCAP, &cap);
+	if (ret < 0)
+		return 0;
+
+	caps = cap.capabilities & V4L2_CAP_DEVICE_CAPS
+	     ? cap.device_caps : cap.capabilities;
+
+	has_video = caps & (V4L2_CAP_VIDEO_CAPTURE_MPLANE |
+			    V4L2_CAP_VIDEO_CAPTURE |
+			    V4L2_CAP_VIDEO_OUTPUT_MPLANE |
+			    V4L2_CAP_VIDEO_OUTPUT);
+	has_meta = caps & (V4L2_CAP_META_CAPTURE |
+			   V4L2_CAP_META_OUTPUT);
+	has_capture = caps & (V4L2_CAP_VIDEO_CAPTURE_MPLANE |
+			      V4L2_CAP_VIDEO_CAPTURE |
+			      V4L2_CAP_META_CAPTURE);
+	has_output = caps & (V4L2_CAP_VIDEO_OUTPUT_MPLANE |
+			     V4L2_CAP_VIDEO_OUTPUT |
+			     V4L2_CAP_META_OUTPUT);
+	has_mplane = caps & (V4L2_CAP_VIDEO_CAPTURE_MPLANE |
+			     V4L2_CAP_VIDEO_OUTPUT_MPLANE);
+
+	printf("Device `%s' on `%s' (driver '%s') supports%s%s%s%s %s mplanes.\n",
+		cap.card, cap.bus_info, cap.driver,
+		has_video ? " video," : "",
+		has_meta ? " meta-data," : "",
+		has_capture ? " capture," : "",
+		has_output ? " output," : "",
+		has_mplane ? "with" : "without");
+
+	*capabilities = caps;
+
+	return 0;
+}
+
+static bool video_has_fd(struct device *dev)
+{
+	return dev->fd != -1;
+}
+
+static int video_open(struct device *dev, const char *devname)
+{
+	if (video_has_fd(dev)) {
+		printf("Can't open device (already open).\n");
+		return -1;
+	}
+
+	dev->fd = open(devname, O_RDWR);
+	if (dev->fd < 0) {
+		printf("Error opening device %s: %s (%d).\n", devname,
+		       strerror(errno), errno);
+		return dev->fd;
+	}
+
+	printf("Device %s opened.\n", devname);
+
+	dev->opened = 1;
+
+	return 0;
+}
 

@@ -1,0 +1,14 @@
+   
+Vikas: main() +
+Vikas: video_init() DONE
+Device /dev/video0 opened.
+Vikas: video_open() DONE
+Device `mmal service 16.1' on `platform:bcm2835-v4l2' (driver 'bm2835 mmal') supports video, capture, without mplanes.
+Vikas: video_querycap() DONE
+Vikas: video_close() DONE
+Vikas: main() -
+   
+   
+[63190.927821] video0: VIDIOC_QUERYCAP: driver=bm2835 mmal, card=mmal service 16.1, bus=platform:bcm2835-v4l2, version=0x00050433, capabilities=0x85200005, device_caps=0x05200005
+   
+   
