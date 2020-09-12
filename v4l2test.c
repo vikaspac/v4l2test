@@ -26,6 +26,7 @@
  *
  * 1) Video device init/close functions
  * 2) Video device open and query cap
+ * 3) Set the buf type as per capabilities, Print the camera and video attributes
  *
  *
  */
@@ -103,6 +104,10 @@ static void video_close(struct device *dev);
 static int video_querycap(struct device *dev, unsigned int *capabilities);
 static bool video_has_fd(struct device *dev);
 static int video_open(struct device *dev, const char *devname);
+static int cap_get_buf_type(unsigned int capabilitiesi);
+static void video_set_buf_type(struct device *dev, enum v4l2_buf_type type);
+static void video_log_status(struct device *dev);
+
 
 
 
@@ -110,8 +115,21 @@ int main()
 {
 
 	struct device dev = { 0 };
-	unsigned int capabilities = V4L2_CAP_VIDEO_CAPTURE;
 	int ret = 0;
+
+
+	int do_log_status = 1;
+
+
+	/* Video related */
+	unsigned int capabilities = V4L2_CAP_VIDEO_CAPTURE;
+
+	enum v4l2_memory memtype = V4L2_MEMORY_MMAP;
+
+
+
+
+
 
 	printf("Vikas: main() +\n");
 
@@ -132,8 +150,21 @@ int main()
 		printf("Vikas: ERR: video_querycap() failed\n");
 		return 1;
 	}
-
 	printf("Vikas: video_querycap() DONE\n");
+
+	ret = cap_get_buf_type(capabilities);
+	if (ret < 0) {
+		printf("Vikas: ERR: cap_get_buf_type() failed\n");
+		return 1;
+	}
+
+	video_set_buf_type(&dev, ret);
+
+	dev.memtype = memtype;
+
+	if (do_log_status)
+		video_log_status(&dev);
+
 
 	video_close(&dev);
 	printf("Vikas: video_close() DONE\n");
@@ -142,6 +173,8 @@ int main()
 	return 0;
 }
 
+
+/* Static Function Definitions */
 
 static void video_init(struct device *dev)
 {
@@ -236,3 +269,40 @@ static int video_open(struct device *dev, const char *devname)
 	return 0;
 }
 
+static int cap_get_buf_type(unsigned int capabilities)
+{
+	if (capabilities & V4L2_CAP_VIDEO_CAPTURE_MPLANE) {
+		printf("cap buf: V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE\n");
+		return V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE;
+	} else if (capabilities & V4L2_CAP_VIDEO_OUTPUT_MPLANE) {
+		printf("cap buf: V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE\n");
+		return V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE;
+	} else if (capabilities & V4L2_CAP_VIDEO_CAPTURE) {
+		printf("cap buf: V4L2_BUF_TYPE_VIDEO_CAPTURE\n");
+		return  V4L2_BUF_TYPE_VIDEO_CAPTURE;
+	} else if (capabilities & V4L2_CAP_VIDEO_OUTPUT) {
+		printf("cap buf: V4L2_BUF_TYPE_VIDEO_OUTPUT\n");
+		return V4L2_BUF_TYPE_VIDEO_OUTPUT;
+	} else if (capabilities & V4L2_CAP_META_CAPTURE) {
+		printf("cap buf: V4L2_BUF_TYPE_META_CAPTURE\n");
+		return V4L2_BUF_TYPE_META_CAPTURE;
+	} else if (capabilities & V4L2_CAP_META_OUTPUT) {
+		printf("cap buf: V4L2_BUF_TYPE_META_OUTPUT\n");
+		return V4L2_BUF_TYPE_META_OUTPUT;
+	} else {
+		printf("Device supports neither capture nor output.\n");
+		return -EINVAL;
+	}
+
+	return 0;
+}
+
+static void video_set_buf_type(struct device *dev, enum v4l2_buf_type type)
+{
+	dev->type = type;
+}
+
+static void video_log_status(struct device *dev)
+{
+	ioctl(dev->fd, VIDIOC_LOG_STATUS);
+}

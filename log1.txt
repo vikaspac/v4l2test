@@ -1,14 +1,47 @@
-   
+
 Vikas: main() +
 Vikas: video_init() DONE
 Device /dev/video0 opened.
 Vikas: video_open() DONE
 Device `mmal service 16.1' on `platform:bcm2835-v4l2' (driver 'bm2835 mmal') supports video, capture, without mplanes.
 Vikas: video_querycap() DONE
+cap buf: V4L2_BUF_TYPE_VIDEO_CAPTURE
 Vikas: video_close() DONE
 Vikas: main() -
-   
-   
-[63190.927821] video0: VIDIOC_QUERYCAP: driver=bm2835 mmal, card=mmal service 16.1, bus=platform:bcm2835-v4l2, version=0x00050433, capabilities=0x85200005, device_caps=0x05200005
-   
-   
+
+
+[81100.492711] video0: VIDIOC_QUERYCAP: driver=bm2835 mmal, card=mmal service 16.1, bus=platform:bcm2835-v4l2, version=0x00050433, capabilities=0x85200005, device_caps=0x05200005
+[81100.492739] bcm2835-v4l2: =================  START STATUS  =================
+[81100.492744] v4l2-ctrls: bcm2835-v4l2: Saturation: 0
+[81100.492753] v4l2-ctrls: bcm2835-v4l2: Sharpness: 0
+[81100.492760] v4l2-ctrls: bcm2835-v4l2: Contrast: 0
+[81100.492767] v4l2-ctrls: bcm2835-v4l2: Brightness: 50
+[81100.492775] v4l2-ctrls: bcm2835-v4l2: ISO Sensitivity: 0
+[81100.492782] v4l2-ctrls: bcm2835-v4l2: ISO Sensitivity, Auto: Auto
+[81100.492790] v4l2-ctrls: bcm2835-v4l2: Image Stabilization: false
+[81100.492797] v4l2-ctrls: bcm2835-v4l2: Auto Exposure: Auto Mode
+[81100.492805] v4l2-ctrls: bcm2835-v4l2: Exposure Time, Absolute: 1000
+[81100.492812] v4l2-ctrls: bcm2835-v4l2: Auto Exposure, Bias: 0
+[81100.492820] v4l2-ctrls: bcm2835-v4l2: Exposure, Dynamic Framerate: false
+[81100.492827] v4l2-ctrls: bcm2835-v4l2: Exposure, Metering Mode: Average
+[81100.492834] v4l2-ctrls: bcm2835-v4l2: White Balance, Auto & Preset: Auto
+[81100.492842] v4l2-ctrls: bcm2835-v4l2: Red Balance: 1000
+[81100.492849] v4l2-ctrls: bcm2835-v4l2: Blue Balance: 1000
+[81100.492856] v4l2-ctrls: bcm2835-v4l2: Color Effects: None
+[81100.492864] v4l2-ctrls: bcm2835-v4l2: Color Effects, CbCr: 32896
+[81100.492871] v4l2-ctrls: bcm2835-v4l2: Rotate: 0
+[81100.492879] v4l2-ctrls: bcm2835-v4l2: Horizontal Flip: false
+[81100.492886] v4l2-ctrls: bcm2835-v4l2: Vertical Flip: false
+[81100.492893] v4l2-ctrls: bcm2835-v4l2: Video Bitrate Mode: Variable Bitrate
+[81100.492901] v4l2-ctrls: bcm2835-v4l2: Video Bitrate: 10000000
+[81100.492909] v4l2-ctrls: bcm2835-v4l2: Compression Quality: 30
+[81100.492916] v4l2-ctrls: bcm2835-v4l2: Power Line Frequency: 50 Hz
+[81100.492923] v4l2-ctrls: bcm2835-v4l2: Repeat Sequence Header: false
+[81100.492931] v4l2-ctrls: bcm2835-v4l2: H264 Profile: High
+[81100.492938] v4l2-ctrls: bcm2835-v4l2: H264 Level: 4
+[81100.492945] v4l2-ctrls: bcm2835-v4l2: Scene Mode: None
+[81100.492952] v4l2-ctrls: bcm2835-v4l2: H264 I-Frame Period: 60
+[81100.492960] bcm2835-v4l2: ==================  END STATUS  ==================
+[81100.492964] video0: VIDIOC_LOG_STATUS
+
+
